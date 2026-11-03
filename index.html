@@ -1,0 +1,426 @@
+```html
+<!DOCTYPE html>
+<html lang="en" ng-app="newsApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily News - Online Newspaper</title>
+
+    <!-- AngularJS Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        header {
+            background-color: #102a43;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        header h1 {
+            font-size: 36px;
+            margin: 5px;
+        }
+
+        nav {
+            background-color: #c62828;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 15px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #ffcc80;
+        }
+
+        section {
+            width: 85%;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        h2 {
+            color: #c62828;
+            text-align: center;
+        }
+
+        input, select, textarea {
+            padding: 10px;
+            margin: 8px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 18px;
+            margin: 5px;
+            background-color: #c62828;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #8e0000;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        .news-card {
+            background-color: #f8f8f8;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 5px solid #c62828;
+            border-radius: 5px;
+        }
+
+        .news-card h3 {
+            color: #102a43;
+        }
+
+        .comment-list {
+            background-color: #f2f2f2;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .delete {
+            background-color: #555;
+            float: right;
+        }
+
+        .delete:hover {
+            background-color: #222;
+        }
+
+        .result {
+            color: #c62828;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        footer {
+            background-color: #102a43;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .category {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        ul {
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 12px 0;
+        }
+
+        @media (max-width: 600px) {
+            section {
+                width: 95%;
+                padding: 15px;
+            }
+
+            nav a {
+                display: inline-block;
+                margin: 8px;
+            }
+
+            header h1 {
+                font-size: 28px;
+            }
+
+            input, select {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>📰 DAILY NEWS</h1>
+        <p>Your News, Your World - Stay Informed Every Day</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#news">Latest News</a>
+        <a href="#comments">Comments</a>
+        <a href="#calculator">Calculator</a>
+        <a href="#tasks">Reading List</a>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" ng-controller="HelloController">
+        <h2>Welcome to Daily News</h2>
+
+        <div class="content">
+            <h3>{{message}}</h3>
+            <p>
+                Get the latest updates on politics, technology,
+                sports, education, business, and world events.
+            </p>
+            <p><strong>Read the news. Know the world.</strong></p>
+        </div>
+    </section>
+
+    <!-- Latest News Section -->
+    <section id="news" ng-controller="NewsController">
+        <h2>Latest News Headlines</h2>
+
+        <div class="content">
+            <p>Explore the latest news stories.</p>
+
+            <input type="text"
+                   ng-model="searchText"
+                   placeholder="Search news headlines">
+
+            <select ng-model="selectedCategory">
+                <option value="">All Categories</option>
+                <option value="Technology">Technology</option>
+                <option value="Sports">Sports</option>
+                <option value="Education">Education</option>
+                <option value="Business">Business</option>
+            </select>
+        </div>
+
+        <div class="news-card"
+             ng-repeat="news in articles | filter:searchText | filter:{category:selectedCategory}">
+
+            <p class="category">{{news.category}}</p>
+            <h3>{{news.title}}</h3>
+            <p>{{news.description}}</p>
+            <small>Published: {{news.date}}</small>
+        </div>
+
+        <p ng-if="(articles | filter:searchText | filter:{category:selectedCategory}).length == 0">
+            No matching news articles found.
+        </p>
+    </section>
+
+    <!-- Comment Section -->
+    <section id="comments" ng-controller="CommentController">
+        <h2>Share Your Opinion</h2>
+
+        <div class="content">
+            <p>Write your comments about the news.</p>
+
+            <textarea ng-model="txtcomment"
+                      placeholder="Write your comment here"
+                      rows="4"
+                      style="width:80%; padding:10px;"></textarea>
+
+            <br>
+
+            <button ng-click="addComment()">Post Comment</button>
+
+            <h3>Reader Comments</h3>
+        </div>
+
+        <div ng-repeat="comment in comments track by $index"
+             class="comment-list">
+
+            {{comment}}
+
+            <button class="delete"
+                    ng-click="removeItem($index)">
+                Delete
+            </button>
+
+            <div style="clear:both;"></div>
+        </div>
+
+        <p ng-if="comments.length == 0">
+            No comments yet. Be the first to comment!
+        </p>
+    </section>
+
+    <!-- Calculator Section -->
+    <section id="calculator" ng-controller="CalculatorController">
+        <h2>News Reading Time Calculator</h2>
+
+        <div class="content">
+            <p>Calculate the total time needed to read news articles.</p>
+
+            <input type="number"
+                   ng-model="a"
+                   placeholder="Number of articles">
+
+            <br>
+
+            <input type="number"
+                   ng-model="b"
+                   placeholder="Minutes per article">
+
+            <br>
+
+            <button ng-click="calculate()">Calculate Reading Time</button>
+
+            <h3 class="result">Result: {{result}}</h3>
+        </div>
+    </section>
+
+    <!-- Reading List Section -->
+    <section id="tasks" ng-controller="TodoController">
+        <h2>My News Reading List</h2>
+
+        <div class="content">
+            <p>Add the news topics you want to read later.</p>
+
+            <input type="text"
+                   ng-model="title"
+                   placeholder="Enter a news topic">
+
+            <button ng-click="add()">Add Topic</button>
+        </div>
+
+        <h3>Saved Topics</h3>
+
+        <ul>
+            <li ng-repeat="task in tasks track by $index">
+                {{task}}
+
+                <button class="delete"
+                        ng-click="removeTask($index)">
+                    Delete
+                </button>
+
+                <div style="clear:both;"></div>
+            </li>
+        </ul>
+
+        <p ng-if="tasks.length == 0">
+            No topics added yet.
+        </p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <h3>📰 DAILY NEWS</h3>
+        <p>Inform • Inspire • Stay Updated</p>
+        <p>&copy; 2026 Daily News. All Rights Reserved.</p>
+    </footer>
+
+    <!-- AngularJS Controllers -->
+    <script>
+        // Create AngularJS Application
+        var app = angular.module("newsApp", []);
+
+        // 1. Hello Controller
+        app.controller("HelloController", function($scope) {
+            $scope.message = "Hello World! Welcome to Daily News.";
+        });
+
+        // 2. News Controller
+        app.controller("NewsController", function($scope) {
+            $scope.articles = [
+                {
+                    category: "Technology",
+                    title: "Artificial Intelligence Continues to Grow",
+                    description: "New AI developments are creating opportunities in education, healthcare, and business.",
+                    date: "November 3, 2026"
+                },
+                {
+                    category: "Sports",
+                    title: "Young Athletes Prepare for Upcoming Events",
+                    description: "Athletes are training hard and preparing for major sporting competitions.",
+                    date: "November 3, 2026"
+                },
+                {
+                    category: "Education",
+                    title: "Digital Learning Transforms Classrooms",
+                    description: "Online learning tools are helping students access educational resources.",
+                    date: "November 3, 2026"
+                },
+                {
+                    category: "Business",
+                    title: "Small Businesses Explore Digital Markets",
+                    description: "Businesses are using online platforms to reach more customers.",
+                    date: "November 3, 2026"
+                }
+            ];
+        });
+
+        // 3. Comment Controller
+        app.controller("CommentController", function($scope) {
+            $scope.comments = [];
+
+            $scope.addComment = function() {
+                if ($scope.txtcomment && $scope.txtcomment.trim() !== "") {
+                    $scope.comments.push($scope.txtcomment.trim());
+                    $scope.txtcomment = "";
+                }
+            };
+
+            $scope.removeItem = function(index) {
+                $scope.comments.splice(index, 1);
+            };
+        });
+
+        // 4. Reading Time Calculator Controller
+        app.controller("CalculatorController", function($scope) {
+            $scope.a = 0;
+            $scope.b = 0;
+
+            $scope.calculate = function() {
+                if ($scope.a < 0 || $scope.b < 0) {
+                    $scope.result = "Please enter positive numbers.";
+                } else {
+                    $scope.result = ($scope.a * $scope.b) + " minutes";
+                }
+            };
+        });
+
+        // 5. Reading List Controller
+        app.controller("TodoController", function($scope) {
+            $scope.tasks = [];
+
+            $scope.add = function() {
+                if ($scope.title && $scope.title.trim() !== "") {
+                    $scope.tasks.push($scope.title.trim());
+                    $scope.title = "";
+                }
+            };
+
+            $scope.removeTask = function(index) {
+                $scope.tasks.splice(index, 1);
+            };
+        });
+    </script>
+
+</body>
+</html>
+```
